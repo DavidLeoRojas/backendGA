@@ -1,20 +1,24 @@
 package com.gemini.backend_gemini_ambiental.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Email;
 
 @Entity
 @Table(name = "Persona")
 public class Persona {
 
     @Id
-    @Column(name = "DNI", length = 20)
+    @Column(name = "DNI", length = 20, nullable = false)
     private String dni;
 
     @Column(name = "tipo_dni", nullable = false)
@@ -26,6 +30,7 @@ public class Persona {
     @Column(name = "telefono")
     private String telefono;
 
+    @Email
     @Column(name = "correo", unique = true)
     private String correo;
 
@@ -34,11 +39,24 @@ public class Persona {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ID_direccion")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Direccion direccion;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ID_cargo_especialidad")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private CargoEspecialidad cargoEspecialidad;
+
+    // Nuevos campos para manejar Persona Natural y Jurídica
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo_persona", nullable = false)
+    private TipoPersona tipoPersona = TipoPersona.Natural;
+
+    @Column(name = "nit", length = 20)
+    private String nit;
+
+    @Column(name = "representante_legal", length = 20)
+    private String representanteLegal;
 
     // Constructors
     public Persona() {}
@@ -112,5 +130,35 @@ public class Persona {
 
     public void setCargoEspecialidad(CargoEspecialidad cargoEspecialidad) {
         this.cargoEspecialidad = cargoEspecialidad;
+    }
+
+    // Nuevos getters y setters
+    public TipoPersona getTipoPersona() {
+        return tipoPersona;
+    }
+
+    public void setTipoPersona(TipoPersona tipoPersona) {
+        this.tipoPersona = tipoPersona;
+    }
+
+    public String getNit() {
+        return nit;
+    }
+
+    public void setNit(String nit) {
+        this.nit = nit;
+    }
+
+    public String getRepresentanteLegal() {
+        return representanteLegal;
+    }
+
+    public void setRepresentanteLegal(String representanteLegal) {
+        this.representanteLegal = representanteLegal;
+    }
+
+    // Enum para tipo de persona    
+    public enum TipoPersona {
+        Natural, Juridica
     }
 }

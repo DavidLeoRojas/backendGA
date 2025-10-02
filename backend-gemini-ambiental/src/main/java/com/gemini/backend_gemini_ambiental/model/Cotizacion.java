@@ -1,7 +1,7 @@
 package com.gemini.backend_gemini_ambiental.model;
 
 import java.math.BigDecimal;
-import java.time.LocalDate; // Importar BigDecimal
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -12,10 +12,13 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
 @Entity
@@ -24,15 +27,14 @@ public class Cotizacion {
 
     @Id
     @Column(name = "ID_cotizacion", length = 36)
+    @GeneratedValue(strategy = GenerationType.UUID)
     private String idCotizacion;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "DNI_cliente", nullable = false)
-    private Persona cliente;
+    @Column(name = "DNI_cliente", nullable = false, length = 20)
+    private String dniCliente;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "DNI_empleado")
-    private Persona empleado;
+    @Column(name = "DNI_empleado", length = 20)
+    private String dniEmpleado;
 
     @Column(name = "estado", nullable = false)
     @Enumerated(EnumType.STRING)
@@ -47,7 +49,7 @@ public class Cotizacion {
     @Column(name = "fecha_respuesta")
     private LocalDateTime fechaRespuesta;
 
-    @Column(name = "prioridad")
+    @Column(name = "prioridad", length = 50)
     private String prioridad;
 
     @Column(name = "descripcion_problema", columnDefinition = "TEXT")
@@ -56,19 +58,36 @@ public class Cotizacion {
     @Column(name = "notas_internas", columnDefinition = "TEXT")
     private String notasInternas;
 
-    // Cambiar Double a BigDecimal y usar precision y scale
     @Column(name = "costo_total_cotizacion", precision = 12, scale = 2)
-    private BigDecimal costoTotalCotizacion;
+    private BigDecimal costoTotalCotizacion = BigDecimal.ZERO;
 
     @OneToMany(mappedBy = "cotizacion", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<DetalleCotizacion> detalles = new HashSet<>();
 
+    // AÑADIR RELACIÓN CON PERSONA PARA TRAER DATOS DEL CLIENTE
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "DNI_cliente", referencedColumnName = "DNI", insertable = false, updatable = false)
+    private Persona cliente;
+
+    @PrePersist
+    public void prePersist() {
+        if (this.fechaSolicitud == null) {
+            this.fechaSolicitud = LocalDateTime.now();
+        }
+        if (this.estado == null) {
+            this.estado = EstadoCotizacion.Pendiente;
+        }
+        if (this.costoTotalCotizacion == null) {
+            this.costoTotalCotizacion = BigDecimal.ZERO;
+        }
+    }
+
     // Constructors
     public Cotizacion() {}
 
-    public Cotizacion(String idCotizacion, Persona cliente, LocalDateTime fechaSolicitud) {
+    public Cotizacion(String idCotizacion, String dniCliente, LocalDateTime fechaSolicitud) {
         this.idCotizacion = idCotizacion;
-        this.cliente = cliente;
+        this.dniCliente = dniCliente;
         this.fechaSolicitud = fechaSolicitud;
     }
 
@@ -81,20 +100,20 @@ public class Cotizacion {
         this.idCotizacion = idCotizacion;
     }
 
-    public Persona getCliente() {
-        return cliente;
+    public String getDniCliente() {
+        return dniCliente;
     }
 
-    public void setCliente(Persona cliente) {
-        this.cliente = cliente;
+    public void setDniCliente(String dniCliente) {
+        this.dniCliente = dniCliente;
     }
 
-    public Persona getEmpleado() {
-        return empleado;
+    public String getDniEmpleado() {
+        return dniEmpleado;
     }
 
-    public void setEmpleado(Persona empleado) {
-        this.empleado = empleado;
+    public void setDniEmpleado(String dniEmpleado) {
+        this.dniEmpleado = dniEmpleado;
     }
 
     public EstadoCotizacion getEstado() {
@@ -167,6 +186,14 @@ public class Cotizacion {
 
     public void setDetalles(Set<DetalleCotizacion> detalles) {
         this.detalles = detalles;
+    }
+
+    public Persona getCliente() {
+        return cliente;
+    }
+
+    public void setCliente(Persona cliente) {
+        this.cliente = cliente;
     }
 
     public enum EstadoCotizacion {

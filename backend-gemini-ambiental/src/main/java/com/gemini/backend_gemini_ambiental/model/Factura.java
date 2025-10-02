@@ -1,9 +1,11 @@
 package com.gemini.backend_gemini_ambiental.model;
 
 import java.math.BigDecimal;
-import java.time.LocalDate; // Importar BigDecimal
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -11,6 +13,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -23,16 +27,17 @@ public class Factura {
 
     @Id
     @Column(name = "ID_factura", length = 36)
+    @GeneratedValue(strategy = GenerationType.UUID)
     private String idFactura;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "DNI_cliente", nullable = false)
+    @JsonIgnoreProperties({"|", "handler"}) // Añadir esta línea
     private Persona cliente;
 
     @Column(name = "fecha_emision", nullable = false)
     private LocalDate fechaEmision;
 
-    // Cambiar Double a BigDecimal y usar precision y scale
     @Column(name = "monto_total", precision = 12, scale = 2, nullable = false)
     private BigDecimal montoTotal;
 
@@ -71,6 +76,11 @@ public class Factura {
 
     public void setCliente(Persona cliente) {
         this.cliente = cliente;
+    }
+
+    // Nuevo getter para obtener el DNI del cliente
+    public String getDniCliente() {
+        return cliente != null ? cliente.getDni() : null;
     }
 
     public LocalDate getFechaEmision() {

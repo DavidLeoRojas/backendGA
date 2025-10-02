@@ -1,8 +1,19 @@
 package com.gemini.backend_gemini_ambiental.model;
 
-import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "Direccion")
@@ -20,10 +31,12 @@ public class Direccion {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "depende_de")
+    @JsonIgnore
     private Direccion dependeDe;
 
     // Relación inversa (opcional, para navegación bidireccional)
     @OneToMany(mappedBy = "dependeDe", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Direccion> subDirecciones = new ArrayList<>();
 
     // Constructors

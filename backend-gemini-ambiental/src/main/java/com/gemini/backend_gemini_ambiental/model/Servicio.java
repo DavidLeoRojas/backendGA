@@ -6,12 +6,16 @@ import java.time.LocalTime;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -24,15 +28,18 @@ import jakarta.persistence.Table;
 public class Servicio {
 
     @Id
-    @Column(name = "ID_servicio", length = 36)
+    @GeneratedValue(strategy = GenerationType.UUID)   
+   @Column(name = "ID_servicio", length = 36, nullable = false)
     private String idServicio;
 
     @OneToOne(fetch = FetchType.LAZY) // Un servicio puede salir de una cotización aprobada
     @JoinColumn(name = "ID_cotizacion")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) // Añadir esta línea
     private Cotizacion cotizacion;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "DNI_empleado_asignado")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) // Añadir esta línea
     private Persona empleadoAsignado;
 
     @Column(name = "fecha", nullable = false)

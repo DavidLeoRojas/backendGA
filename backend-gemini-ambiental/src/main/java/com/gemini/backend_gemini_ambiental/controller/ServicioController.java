@@ -1,6 +1,5 @@
 package com.gemini.backend_gemini_ambiental.controller;
 
-
 import java.util.List;
 import java.util.Optional;
 
@@ -40,7 +39,7 @@ public class ServicioController {
     @PostMapping
     public ResponseEntity<String> createServicio(@RequestBody Servicio servicio) {
         try {
-            // Opcional: Validar que el empleado exista
+            // Validar que el empleado exista
             // if (servicio.getEmpleadoAsignado() != null && !personaService.existsById(servicio.getEmpleadoAsignado().getDni())) {
             //     return ResponseEntity.badRequest().body("Empleado no encontrado.");
             // }
@@ -76,5 +75,19 @@ public class ServicioController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error al eliminar el servicio: " + e.getMessage());
         }
+    }
+
+    // Nuevo endpoint para servicios por empleado
+    @GetMapping("/empleado/{dni}")
+    public ResponseEntity<List<Servicio>> getServiciosByEmpleado(@PathVariable String dni) {
+        List<Servicio> servicios = servicioService.findByEmpleado(dni);
+        return ResponseEntity.ok(servicios);
+    }
+
+    // Nuevo endpoint para servicios por cotización
+    @GetMapping("/cotizacion/{idCotizacion}")
+    public ResponseEntity<List<Servicio>> getServiciosByCotizacion(@PathVariable String idCotizacion) {
+        List<Servicio> servicios = servicioService.findByCotizacion(idCotizacion);
+        return ResponseEntity.ok(servicios);
     }
 }

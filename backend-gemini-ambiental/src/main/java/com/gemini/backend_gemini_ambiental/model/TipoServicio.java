@@ -2,55 +2,60 @@ package com.gemini.backend_gemini_ambiental.model;
 
 import java.math.BigDecimal;
 
-import jakarta.persistence.Column; // Importar BigDecimal
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "Tipo_servicio")
+@RestController
+@RequestMapping("/api/tipos-servicio")
+@CrossOrigin(origins = "*") // <-- Permite todos los orígenes (solo para desarrollo)
+@Table(name = "tipos_servicio")
 public class TipoServicio {
 
     @Id
-    @Column(name = "ID_tipo_servicio", length = 36)
-    private String idTipoServicio;
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // <-- Esta línea es crucial
+    @Column(name = "id_tipo_servicio", nullable = false)
+    private String idTipoServicio; // Asumiendo que es String. Si es Long, cambia el tipo.
 
-    @Column(name = "nombre_servicio", nullable = false)
+    @Column(name = "nombre_servicio", nullable = false, length = 255)
     private String nombreServicio;
 
-    @Column(name = "descripcion", columnDefinition = "TEXT")
-    private String descripcion;
+    @Column(name = "categoria", nullable = false, length = 100)
+    private String categoria;
 
-    // Cambiar Double a BigDecimal y usar precision y scale
-    @Column(name = "costo", precision = 12, scale = 2, nullable = false)
+    @Column(name = "costo", nullable = false, precision = 10, scale = 2)
     private BigDecimal costo;
 
-    @Column(name = "frecuencia")
-    private String frecuencia;
-
-    @Column(name = "duracion")
+    @Column(name = "duracion", nullable = false, length = 50)
     private String duracion;
 
-    @Column(name = "estado", nullable = false)
-    @Enumerated(EnumType.STRING)
-    private EstadoServicio estado = EstadoServicio.Activo;
+    @Column(name = "frecuencia", nullable = false, length = 50)
+    private String frecuencia;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "ID_categoria_servicio", nullable = false)
-    private CategoriaServicio categoriaServicio;
+    @Column(name = "descripcion_extendida", nullable = false, length = 500)
+    private String descripcionExtendida;
+
+    @Column(name = "icono", length = 10)
+    private String icono;
 
     // Constructors
     public TipoServicio() {}
 
-    public TipoServicio(String idTipoServicio, String nombreServicio, BigDecimal costo) {
-        this.idTipoServicio = idTipoServicio;
+    public TipoServicio(String nombreServicio, String categoria, BigDecimal costo, String duracion, String frecuencia, String descripcionExtendida) {
         this.nombreServicio = nombreServicio;
+        this.categoria = categoria;
         this.costo = costo;
+        this.duracion = duracion;
+        this.frecuencia = frecuencia;
+        this.descripcionExtendida = descripcionExtendida;
     }
 
     // Getters and Setters
@@ -70,12 +75,12 @@ public class TipoServicio {
         this.nombreServicio = nombreServicio;
     }
 
-    public String getDescripcion() {
-        return descripcion;
+    public String getCategoria() {
+        return categoria;
     }
 
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
+    public void setCategoria(String categoria) {
+        this.categoria = categoria;
     }
 
     public BigDecimal getCosto() {
@@ -86,14 +91,6 @@ public class TipoServicio {
         this.costo = costo;
     }
 
-    public String getFrecuencia() {
-        return frecuencia;
-    }
-
-    public void setFrecuencia(String frecuencia) {
-        this.frecuencia = frecuencia;
-    }
-
     public String getDuracion() {
         return duracion;
     }
@@ -102,23 +99,27 @@ public class TipoServicio {
         this.duracion = duracion;
     }
 
-    public EstadoServicio getEstado() {
-        return estado;
+    public String getFrecuencia() {
+        return frecuencia;
     }
 
-    public void setEstado(EstadoServicio estado) {
-        this.estado = estado;
+    public void setFrecuencia(String frecuencia) {
+        this.frecuencia = frecuencia;
     }
 
-    public CategoriaServicio getCategoriaServicio() {
-        return categoriaServicio;
+    public String getDescripcionExtendida() {
+        return descripcionExtendida;
     }
 
-    public void setCategoriaServicio(CategoriaServicio categoriaServicio) {
-        this.categoriaServicio = categoriaServicio;
+    public void setDescripcionExtendida(String descripcionExtendida) {
+        this.descripcionExtendida = descripcionExtendida;
     }
 
-    public enum EstadoServicio {
-        Activo, Inactivo, En_revisionn
+    public String getIcono() {
+        return icono;
+    }
+
+    public void setIcono(String icono) {
+        this.icono = icono;
     }
 }

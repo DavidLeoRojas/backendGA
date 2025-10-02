@@ -1,7 +1,6 @@
 package com.gemini.backend_gemini_ambiental.service;
 
-
-
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,10 +29,30 @@ public class ServicioService {
     }
 
     public Servicio save(Servicio servicio) {
+        // Validar que no se programe en fecha pasada
+        if (servicio.getFecha() != null && servicio.getFecha().isBefore(LocalDate.now())) {
+            throw new RuntimeException("No se puede programar un servicio en una fecha pasada");
+        }
+        
         return servicioRepository.save(servicio);
     }
 
     public void deleteById(String id) {
+        // Verificar que no esté en factura o tenga productos asociados
+        Servicio servicio = servicioRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Servicio no encontrado"));
+            
+        // Aquí puedes implementar la lógica para verificar si está en factura
+        // o tiene productos asociados antes de eliminar
+        
         servicioRepository.deleteById(id);
+    }
+
+    public List<Servicio> findByEmpleado(String dniEmpleado) {
+        return servicioRepository.findByEmpleadoAsignadoDni(dniEmpleado);
+    }
+
+    public List<Servicio> findByCotizacion(String idCotizacion) {
+        return servicioRepository.findByCotizacionIdCotizacion(idCotizacion);
     }
 }

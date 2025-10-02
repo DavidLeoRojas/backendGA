@@ -2,6 +2,8 @@ package com.gemini.backend_gemini_ambiental.model;
 
 import java.math.BigDecimal;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.Column; // Importar BigDecimal
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -32,7 +34,8 @@ public class Producto {
     private String unidadMedida;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ID_categoria_producto")
+    @JoinColumn(name = "ID_categoria_producto", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private CategoriaProducto categoriaProducto;
 
     // Constructors
